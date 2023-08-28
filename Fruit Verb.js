@@ -1,23 +1,50 @@
-const searchBar = document.getElementById('searchBar');
-const suggestions = document.getElementById('suggestions');
+ const searchBar = document.getElementById("searchBar");
+ const suggestions = document.getElementById("suggestions");
 
-const fruits = ['strawberries', 'apple', 'orange', 'banana', 'mandarin', 'watermelon', 'pineapple', 'pear'];
+ const fruits = ['apple', 'banana', 'cherry', 'grape', 'orange', 'pear', 'strawberry','pineapple', 'kiwi', 'papaya','date'];
 
-searchBar.addEventListener('input', function() {
-    const searchTerm = searchBar.value.toLowerCase();
-    const filteredFruits = fruits.filter(fruit => fruit.startsWith(searchTerm));
+ searchBar.addEventListener('input', function(event) {
+     const userInput = event.target.value.toLowerCase();
+     const matchingFruits = fruits.filter(fruit => fruit.includes(userInput));
 
-    if (searchTerm === '') {
+     suggestions.innerHTML = "";
+     matchingFruits.forEach(fruit => {
+         const suggestion = document.createElement("div");
+         suggestion.textContent = fruit;
+         suggestions.appendChild(suggestion);
+     });
+
+     if (userInput === '') {
+         suggestions.style.display = 'none';
+     } else {
+         suggestions.style.display = 'block';
+     }
+ });
+
+ suggestions.addEventListener('click', function(event) {
+     if (event.target.tagName === 'DIV') {
+         searchBar.value = event.target.textContent;
+         suggestions.style.display = 'none';
+     }
+ });
+
+searchBar.addEventListener('input', function(event) {
+    const userInput = event.target.value.toLowerCase();
+    const matchingFruits = fruits.filter(fruit => fruit.includes(userInput));
+
+    if (userInput === '') {
         suggestions.style.display = 'none';
+        submenu.style.display = 'none';
     } else {
         suggestions.style.display = 'block';
-        suggestions.innerHTML = filteredFruits.map(fruit => `<div>${fruit}</div>`).join('');
-    }
-});
-
-suggestions.addEventListener('click', function(event){
-    if (event.target.tagName === 'DIV') {
-        searchBar.value = event.target.textContent;
-        suggestions.style.display = 'none';
+        submenu.style.display = 'none';
+        suggestions.innerHTML = matchingFruits.map(fruit => {
+            const highlightedFruit = fruit.replace(new RegExp(userInput, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+            return `<div>${highlightedFruit}</div>`;
+        }).join('');
+        
+        const searchBarRect = searchBar.getBoundingClientRect();
+        suggestions.style.left = searchBarRect.left + 'px';
+        suggestions.style.top = searchBarRect.bottom + 'px';
     }
 });
